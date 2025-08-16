@@ -14,8 +14,8 @@ const Header = () => {
               className="h-6 w-6 mr-1 lg:h-9 lg:w-9 lg:mr-2"
             />
             <h1 className="font-extrabold text-lg flex lg:text-2xl">
-              <span className="text-[#2A3642]">Nest</span>
-              <span className="text-[#49575C]">ify</span>
+              <span className="text-slate-800">Nest</span>
+              <span className="text-slate-600">ify</span>
             </h1>
           </div>
         </Link>
@@ -29,17 +29,17 @@ const Header = () => {
         </form>
         <ul className="flex gap-2 text-xs sm:text-sm lg:gap-4 lg:text-base">
           <Link to="/">
-            <li className="hidden sm:inline text-slate-700 hover:text-black cursor-pointer font-bold">
+            <li className="hidden sm:inline text-slate-600 hover:text-slate-900 cursor-pointer font-bold">
               Home
             </li>
           </Link>
           <Link to="/about">
-            <li className="hidden sm:inline text-slate-700 hover:text-black cursor-pointer font-bold">
+            <li className="hidden sm:inline text-slate-600 hover:text-slate-900 cursor-pointer font-bold">
               About
             </li>
           </Link>
           <Link to="/sign-in">
-            <li className="text-slate-700 hover:text-black cursor-pointer font-bold">
+            <li className="text-slate-600 hover:text-slate-900 cursor-pointer font-bold">
               Sign-in
             </li>
           </Link>
