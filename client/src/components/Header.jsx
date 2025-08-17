@@ -5,29 +5,34 @@ import { Link } from "react-router-dom";
 const Header = () => {
   return (
     <header className="bg-slate-200 shadow-md">
-      <div className="flex justify-between items-center p-2 px-4 lg:p-3 lg:px-10 w-full">
-        <Link to="/">
-          <div className="flex items-center cursor-pointer">
-            <img
-              src={NestIcon}
-              alt="Nest Logo"
-              className="h-6 w-6 mr-1 lg:h-9 lg:w-9 lg:mr-2"
-            />
-            <h1 className="font-extrabold text-lg flex lg:text-2xl">
-              <span className="text-slate-800">Nest</span>
-              <span className="text-slate-600">ify</span>
-            </h1>
-          </div>
-        </Link>
-        <form className="bg-slate-100 p-1 rounded-lg flex items-center w-full max-w-[120px] sm:max-w-[200px] md:max-w-[300px] lg:max-w-[400px] xl:max-w-[600px] lg:p-1.5">
-          <input
-            type="text"
-            placeholder="Search..."
-            className="bg-transparent focus:outline-none w-full text-sm lg:text-base"
+      <div
+        className="grid grid-cols-3 items-center
+                      py-2 px-2 sm:px-4 lg:py-3 lg:px-10 w-full"
+      >
+        <Link to="/" className="flex items-center">
+          <img
+            src={NestIcon}
+            alt="Nest Logo"
+            className="h-5 w-5 mr-1 sm:h-6 sm:w-6 lg:h-9 lg:w-9 lg:mr-2"
           />
-          <FaSearch className="text-slate-600 ml-1 text-base lg:text-xl" />
+          <h1 className="font-extrabold text-base sm:text-lg lg:text-2xl">
+            <span className="text-slate-800">Nest</span>
+            <span className="text-slate-600">ify</span>
+          </h1>
+        </Link>
+
+        <form className="justify-self-center w-full max-w-[120px] sm:max-w-[200px] md:max-w-[300px] lg:max-w-[400px] xl:max-w-[600px]">
+          <div className="flex items-center bg-slate-100 p-1 rounded-lg shadow">
+            <input
+              type="text"
+              placeholder="Search..."
+              className="bg-transparent focus:outline-none w-full text-sm lg:text-base"
+            />
+            <FaSearch className="text-slate-600 ml-1 text-base lg:text-xl" />
+          </div>
         </form>
-        <ul className="flex gap-2 text-xs sm:text-sm lg:gap-4 lg:text-base">
+
+        <ul className="flex gap-2 text-xs sm:text-sm lg:gap-4 lg:text-base justify-self-end">
           <Link to="/">
             <li className="hidden sm:inline text-slate-600 hover:text-slate-900 cursor-pointer font-bold">
               Home
