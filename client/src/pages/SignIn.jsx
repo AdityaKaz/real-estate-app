@@ -1,13 +1,19 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+} from "../redux/user/userSlice.js";
 
 const SignIn = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const { error, loading } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -16,8 +22,9 @@ const SignIn = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    dispatch(signInStart());
+
     try {
-      setLoading(true);
       const res = await fetch("/api/auth/signin", {
         method: "POST",
         headers: {
@@ -27,25 +34,24 @@ const SignIn = () => {
       });
 
       const data = await res.json();
+
       if (!res.ok) {
-        if (data.message?.includes("invalid credentials")) {
-          setError("Invalid email or password. Please try again.");
-        } else {
-          setError("Something went wrong. Please try again later.");
-        }
-        setLoading(false);
+        dispatch(signInFailure(data.message || "Sign in failed."));
         return;
       }
-      setLoading(false);
+
+      dispatch(signInSuccess(data));
       setFormData({
         email: "",
         password: "",
       });
-      setError(null);
       navigate("/");
     } catch (err) {
-      setError("Unable to connect to the server. Please check your internet.");
-      setLoading(false);
+      dispatch(
+        signInFailure(
+          "Unable to connect to the server. Please check your internet."
+        )
+      );
     }
   };
 
@@ -57,6 +63,7 @@ const SignIn = () => {
           type="email"
           placeholder="Email"
           id="email"
+          value={formData.email}
           onChange={handleChange}
           className="border border-slate-300 p-3 rounded-lg shadow-sm
                      focus:outline-none focus:ring-2 focus:ring-blue-400
@@ -66,6 +73,7 @@ const SignIn = () => {
           type="password"
           placeholder="Password"
           id="password"
+          value={formData.password}
           onChange={handleChange}
           className="border border-slate-300 p-3 rounded-lg shadow-sm
                      focus:outline-none focus:ring-2 focus:ring-blue-400
