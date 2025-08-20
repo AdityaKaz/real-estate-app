@@ -1,10 +1,11 @@
 import NestIcon from "../assets/nest_icon.png";
 import { FaSearch } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const Header = () => {
   const location = useLocation();
-
+  const { currentUser } = useSelector((state) => state.user);
   const hidePaths = ["/sign-in", "/sign-up"];
   const shouldHideElements = hidePaths.includes(location.pathname);
 
@@ -25,7 +26,6 @@ const Header = () => {
             <span className="text-slate-600">ify</span>
           </h1>
         </Link>
-
         {!shouldHideElements && (
           <form className="justify-self-center w-full max-w-[120px] sm:max-w-[200px] md:max-w-[300px] lg:max-w-[400px] xl:max-w-[600px]">
             <div className="flex items-center bg-slate-100 p-1 rounded-lg shadow">
@@ -38,7 +38,6 @@ const Header = () => {
             </div>
           </form>
         )}
-
         {!shouldHideElements && (
           <ul className="flex gap-2 text-xs sm:text-sm lg:gap-4 lg:text-base justify-self-end">
             <Link to="/">
@@ -52,9 +51,17 @@ const Header = () => {
               </li>
             </Link>
             <Link to="/sign-in">
-              <li className="text-slate-600 hover:text-black cursor-pointer font-bold">
-                Sign-in
-              </li>
+              {currentUser && currentUser.photoUrl ? (
+                <img
+                  src={currentUser.photoUrl}
+                  alt="User Avatar"
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+              ) : (
+                <li className="text-slate-600 hover:text-black cursor-pointer font-bold">
+                  Sign-in
+                </li>
+              )}
             </Link>
           </ul>
         )}
@@ -64,3 +71,4 @@ const Header = () => {
 };
 
 export default Header;
+  
