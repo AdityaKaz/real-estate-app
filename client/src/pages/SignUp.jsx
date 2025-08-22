@@ -93,8 +93,7 @@ const SignUp = () => {
           disabled={loading}
           type="submit"
           className="bg-slate-700 text-white p-3 rounded-lg uppercase font-medium
-                     hover:bg-slate-800 focus:outline-none focus:ring-2
-                     focus:ring-blue-400 disabled:opacity-70 transition"
+                     hover:bg-slate-800 focus:outline-none disabled:opacity-70 transition"
         >
           {loading ? "Loading..." : "Sign Up"}
         </button>
