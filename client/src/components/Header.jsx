@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 const Header = () => {
   const location = useLocation();
   const { currentUser } = useSelector((state) => state.user);
-  const hidePaths = ["/sign-in", "/sign-up"];
+  const hidePaths = ["/sign-in", "/sign-up", "/profile"];
   const shouldHideElements = hidePaths.includes(location.pathname);
 
   return (
@@ -39,7 +39,7 @@ const Header = () => {
           </form>
         )}
         {!shouldHideElements && (
-          <ul className="flex gap-2 text-xs sm:text-sm lg:gap-4 lg:text-base justify-self-end">
+          <ul className="flex items-center gap-2 text-xs sm:text-sm lg:gap-4 lg:text-base justify-self-end">
             <Link to="/">
               <li className="hidden sm:inline text-slate-600 hover:text-black cursor-pointer font-bold">
                 Home
@@ -50,11 +50,11 @@ const Header = () => {
                 About
               </li>
             </Link>
-            <Link to="/sign-in">
-              {currentUser && currentUser.photoUrl ? (
+            <Link to="/profile">
+              {currentUser ? (
                 <img
                   src={currentUser.photoUrl}
-                  alt="User Avatar"
+                  alt="profile"
                   className="w-8 h-8 rounded-full object-cover"
                 />
               ) : (
@@ -71,4 +71,3 @@ const Header = () => {
 };
 
 export default Header;
-  
