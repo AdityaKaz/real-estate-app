@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -16,6 +16,12 @@ const SignIn = () => {
   const { error, loading } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (error) {
+      dispatch(signInFailure(null));
+    }
+  }, [dispatch]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -70,8 +76,8 @@ const SignIn = () => {
           value={formData.email}
           onChange={handleChange}
           className="border border-slate-300 p-3 rounded-lg shadow-sm
-                     focus:outline-none focus:ring-2 focus:ring-blue-400
-                     placeholder:text-slate-400 caret-blue-500 transition"
+                      focus:outline-none focus:ring-2 focus:ring-blue-400
+                      placeholder:text-slate-400 caret-blue-500 transition"
         />
         <input
           type="password"
@@ -80,14 +86,14 @@ const SignIn = () => {
           value={formData.password}
           onChange={handleChange}
           className="border border-slate-300 p-3 rounded-lg shadow-sm
-                     focus:outline-none focus:ring-2 focus:ring-blue-400
-                     placeholder:text-slate-400 caret-blue-500 transition"
+                      focus:outline-none focus:ring-2 focus:ring-blue-400
+                      placeholder:text-slate-400 caret-blue-500 transition"
         />
         <button
           disabled={loading}
           type="submit"
           className="bg-slate-700 text-white p-3 rounded-lg uppercase font-medium
-                     hover:bg-slate-800 focus:outline-none disabled:opacity-70 transition"
+                      hover:bg-slate-800 focus:outline-none disabled:opacity-70 transition"
         >
           {loading ? "Loading..." : "Sign In"}
         </button>

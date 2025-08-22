@@ -171,7 +171,7 @@ const Profile = () => {
             <button
               type="button"
               onClick={handleCancel}
-              className="flex-1 bg-gray-300 text-gray-700 p-3 rounded-lg uppercase font-medium hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 transition"
+              className="flex-1 bg-gray-300 text-black-700 p-3 rounded-lg uppercase font-medium hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 transition"
             >
               Cancel
             </button>
