@@ -3,14 +3,12 @@ import bcryptjs from "bcryptjs";
 import { errorHandler } from "../utils/error.js";
 import jwt from "jsonwebtoken";
 
-// ---------------------- SIGNUP ----------------------
 export const signup = async (req, res, next) => {
   const { username, email, password } = req.body;
   const hashedPassword = bcryptjs.hashSync(password, 10);
   const newUser = new User({ username, email, password: hashedPassword });
   try {
     await newUser.save();
-    // Normalize: Send 'id' instead of '_id'
     const { password: pass, _id, ...userData } = newUser._doc;
     res.status(201).json({
       message: "User signed up successfully",
@@ -21,7 +19,6 @@ export const signup = async (req, res, next) => {
   }
 };
 
-// ---------------------- SIGNIN ----------------------
 export const signin = async (req, res, next) => {
   const { email, password } = req.body;
   try {
@@ -40,13 +37,12 @@ export const signin = async (req, res, next) => {
         httpOnly: true,
       })
       .status(200)
-      .json({ id: _id, ...userData }); // <-- Always return 'id'
+      .json({ id: _id, ...userData });
   } catch (error) {
     next(error);
   }
 };
 
-// ---------------------- GOOGLE AUTH ----------------------
 export const googleAuth = async (req, res, next) => {
   try {
     const { name, email, photoUrl } = req.body;
@@ -83,8 +79,20 @@ export const googleAuth = async (req, res, next) => {
           httpOnly: true,
         })
         .status(201)
-        .json({ id: _id, ...userData }); // <-- Always return 'id'
+        .json({ id: _id, ...userData });
     }
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const signout = (req, res, next) => {
+  try {
+    res.clearCookie("access_token");
+    return res.status(200).json({
+      status: "success",
+      message: "User signed out successfully",
+    });
   } catch (error) {
     next(error);
   }
