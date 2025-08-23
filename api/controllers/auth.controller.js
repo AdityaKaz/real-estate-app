@@ -3,18 +3,25 @@ import bcryptjs from "bcryptjs";
 import { errorHandler } from "../utils/error.js";
 import jwt from "jsonwebtoken";
 
+// ---------------------- SIGNUP ----------------------
 export const signup = async (req, res, next) => {
   const { username, email, password } = req.body;
   const hashedPassword = bcryptjs.hashSync(password, 10);
   const newUser = new User({ username, email, password: hashedPassword });
   try {
     await newUser.save();
-    res.status(201).json({ message: "User signed up successfully" });
+    // Normalize: Send 'id' instead of '_id'
+    const { password: pass, _id, ...userData } = newUser._doc;
+    res.status(201).json({
+      message: "User signed up successfully",
+      user: { id: _id, ...userData },
+    });
   } catch (error) {
     next(error);
   }
 };
 
+// ---------------------- SIGNIN ----------------------
 export const signin = async (req, res, next) => {
   const { email, password } = req.body;
   try {
@@ -27,53 +34,56 @@ export const signin = async (req, res, next) => {
       return next(errorHandler(401, "Wrong credentials"));
     }
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-    const { password: pass, ...userData } = user._doc;
+    const { password: pass, _id, ...userData } = user._doc;
     res
       .cookie("access_token", token, {
         httpOnly: true,
       })
       .status(200)
-      .json(userData);
+      .json({ id: _id, ...userData }); // <-- Always return 'id'
   } catch (error) {
     next(error);
   }
 };
 
+// ---------------------- GOOGLE AUTH ----------------------
 export const googleAuth = async (req, res, next) => {
   try {
     const { name, email, photoUrl } = req.body;
     let user = await User.findOne({ email });
     if (user) {
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-      const { password: pass, ...userData } = user._doc;
+      const { password: pass, _id, ...userData } = user._doc;
       res
         .cookie("access_token", token, {
           httpOnly: true,
         })
         .status(200)
-        .json(userData);
+        .json({ id: _id, ...userData });
     } else {
       const generatedPassword =
         Math.random().toString(36).slice(-8) +
         Math.random().toString(36).slice(-8);
       const hashedPassword = bcryptjs.hashSync(generatedPassword, 10);
+      // Generate unique username
+      const generatedUsername =
+        name.split(" ").join("").toLowerCase() +
+        Math.random().toString(36).slice(-4);
       const newUser = new User({
-        username:
-          name.split(" ").join("").toLowerCase() +
-          Math.random().toString(36).slice(-4),
+        username: generatedUsername,
         email,
         password: hashedPassword,
         photoUrl,
       });
       await newUser.save();
       const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
-      const { password: pass, ...userData } = newUser._doc;
+      const { password: pass, _id, ...userData } = newUser._doc;
       res
         .cookie("access_token", token, {
           httpOnly: true,
         })
         .status(201)
-        .json(userData);
+        .json({ id: _id, ...userData }); // <-- Always return 'id'
     }
   } catch (error) {
     next(error);

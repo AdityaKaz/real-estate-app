@@ -1,6 +1,10 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useRef, useState } from "react";
-import { updateUserProfile } from "../redux/user/userSlice";
+import {
+  updateUserStart,
+  updateUserSuccess,
+  updateUserFailure,
+} from "../redux/user/userSlice";
 
 const Profile = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -24,6 +28,10 @@ const Profile = () => {
   const [uploading, setUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
 
+  // State for messages display (error or success)
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState(""); // "error" or "success"
+
   const handleFileChange = async (e) => {
     if (!isEditing) return; // Prevent upload if not editing
 
@@ -32,6 +40,7 @@ const Profile = () => {
 
     setUploading(true);
     setUploadSuccess(false);
+    setMessage(""); // Clear previous messages
 
     const formData = new FormData();
     formData.append("file", file);
@@ -49,8 +58,13 @@ const Profile = () => {
       const data = await res.json();
       setPhotoUrl(data.secure_url);
       setUploadSuccess(true);
+      setMessage("Upload successful!");
+      setMessageType("success");
     } catch (error) {
       console.error("Error uploading file:", error);
+      setUploadSuccess(false);
+      setMessage("Failed to upload image. Please try again.");
+      setMessageType("error");
     } finally {
       setUploading(false);
     }
@@ -61,14 +75,16 @@ const Profile = () => {
       // Save changes
       handleSubmit();
     } else {
-      // Enter edit mode, save original data
+      // Enter edit mode, save original data and clear messages
       setOriginalData({ photoUrl, username, email });
       setIsEditing(true);
       setUploadSuccess(false);
+      setMessage("");
+      setMessageType("");
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const updatedUser = {
       photoUrl,
       username,
@@ -76,26 +92,60 @@ const Profile = () => {
       password,
     };
 
-    dispatch(updateUserProfile(updatedUser));
-    setIsEditing(false);
-    setPassword("");
-    setUploadSuccess(false);
+    dispatch(updateUserStart());
+    try {
+      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(updatedUser),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to update user");
+      }
+
+      const data = await res.json();
+
+      dispatch(updateUserSuccess(data.data.user));
+      setIsEditing(false);
+      setPassword("");
+      setUploadSuccess(false);
+      setMessage("User updated successfully!");
+      setMessageType("success");
+    } catch (error) {
+      dispatch(updateUserFailure(error.message));
+      if (error.message.toLowerCase().includes("duplicate key")) {
+        setMessage("The username or email is already taken.");
+      } else {
+        setMessage("Failed to update user. Please try again.");
+      }
+      setMessageType("error");
+      console.error("Failed to update user:", error);
+    }
   };
 
   const handleCancel = () => {
-    // Revert changes to original data and exit edit mode
+    // Revert changes to original data, exit edit mode, clear messages
     setPhotoUrl(originalData.photoUrl);
     setUsername(originalData.username);
     setEmail(originalData.email);
     setPassword("");
     setUploadSuccess(false);
     setIsEditing(false);
+    setMessage("");
+    setMessageType("");
   };
 
-  // Common handler to update fields and clear upload success message
+  // Common handler to update fields and clear messages
   const handleFieldChange = (setter) => (e) => {
     setter(e.target.value);
     setUploadSuccess(false);
+    setMessage("");
+    setMessageType("");
   };
 
   return (
@@ -126,17 +176,26 @@ const Profile = () => {
             isEditing ? "cursor-pointer" : "cursor-not-allowed"
           }`}
         />
-        <div className="h-1 flex justify-center items-center mt-2">
+        <div className="h-1 flex justify-center items-center mt-2 min-h-[1.5rem]">
           {uploading && <p className="text-blue-600">Uploading image...</p>}
-          {uploadSuccess && !uploading && (
-            <p className="text-green-600">Upload successful!</p>
+          {!uploading && message && (
+            <p
+              className={
+                messageType === "error" ? "text-red-600" : "text-green-600"
+              }
+            >
+              {message}
+            </p>
           )}
         </div>
+
         <input
           type="text"
           id="username"
           placeholder="username"
-          className="border border-slate-300 p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-slate-400 caret-blue-500 transition"
+          className={`border border-slate-300 p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-slate-400 caret-blue-500 transition ${
+            isEditing ? "cursor-pointer" : "cursor-not-allowed"
+          }`}
           value={username}
           onChange={handleFieldChange(setUsername)}
           disabled={!isEditing}
@@ -145,7 +204,9 @@ const Profile = () => {
           type="email"
           id="email"
           placeholder="email"
-          className="border border-slate-300 p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-slate-400 caret-blue-500 transition"
+          className={`border border-slate-300 p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-slate-400 caret-blue-500 transition ${
+            isEditing ? "cursor-pointer" : "cursor-not-allowed"
+          }`}
           value={email}
           onChange={handleFieldChange(setEmail)}
           disabled={!isEditing}
@@ -154,11 +215,14 @@ const Profile = () => {
           type="password"
           id="password"
           placeholder="password"
-          className="border border-slate-300 p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-slate-400 caret-blue-500 transition"
+          className={`border border-slate-300 p-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-slate-400 caret-blue-500 transition ${
+            isEditing ? "cursor-pointer" : "cursor-not-allowed"
+          }`}
           value={password}
           onChange={handleFieldChange(setPassword)}
           disabled={!isEditing}
         />
+
         <div className="flex gap-3">
           <button
             type="button"

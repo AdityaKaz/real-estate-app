@@ -18,7 +18,8 @@ const userSchema = new mongoose.Schema(
     },
     photoUrl: {
       type: String,
-      default: "https://avatar.iran.liara.run/public/48",
+      default:
+        "https://t4.ftcdn.net/jpg/16/09/59/37/360_F_1609593795_Ae1PPBgGSiy2tKw4GWXeXJtBTQn3dWpn.jpg",
     },
   },
   { timestamps: true }

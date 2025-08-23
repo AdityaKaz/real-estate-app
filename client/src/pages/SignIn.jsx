@@ -71,7 +71,7 @@ const SignIn = () => {
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           type="email"
-          placeholder="Email"
+          placeholder="email"
           id="email"
           value={formData.email}
           onChange={handleChange}
@@ -81,7 +81,7 @@ const SignIn = () => {
         />
         <input
           type="password"
-          placeholder="Password"
+          placeholder="password"
           id="password"
           value={formData.password}
           onChange={handleChange}
